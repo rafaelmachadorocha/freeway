@@ -1,0 +1,328 @@
+<html>
+<meta charset="UTF-8">
+<canvas width="600" height="500"></canvas>
+<audio id="collision" src="material/sons/colidiu.mp3" type="audio/mpeg"></audio>
+<audio id="score" src="material/sons/pontos.wav" type="audio/x-wav"></audio>
+<audio autoplay loop id="soundtrack" src="material/sons/trilha.mp3" type="audio/mpeg"></audio>
+<div><button>song</button></div>	
+<script>
+
+let clearScreen = () => {
+
+	ctx.fillStyle = "white"
+	ctx.fillRect(0, 0, 600, 500);
+}
+
+const refreshScreen = () => {
+	if(!end){
+
+		clearScreen();
+		drawBackground();
+		drawCars();
+		moveCars();
+		returnCars();
+		drawLifeCounter();
+		drawCow();
+		checkLifes();
+		checkBorderCollision();
+		checkWin();
+
+	} else {
+
+		clearScreen ();
+		button.style.display = "none";
+
+	} 
+	
+}
+
+let drawBackground = () => {
+	ctx.drawImage(imgBg, 0, 0, 600, 500);
+}
+
+function drawCar1 () {
+	ctx.drawImage(carImages[0], xCars[0], yCars[0]);
+	xCars[0] += carsSpeed[0];
+
+	if(xCars[0] == 600){
+		xCars[0] = -132;
+	}
+}
+
+function drawCar2 (){
+
+	ctx.drawImage(carImages[1], xCars[1], yCars[1]);
+	xCars[1] += carsSpeed[1];
+
+	if(xCars[1] == 600){
+		xCars[1] = -132;
+	}
+
+}
+
+const drawCar3 = () => {
+	ctx.drawImage(carImages[2], xCars[2], yCars[2])
+	xCars[2] += carsSpeed[2];
+
+	if(xCars[2] == 600){
+		xCars[2] = -132;
+	}
+
+}
+
+const drawCars = () => {
+	for(let i = 0; i < carImages.length; i++){
+		ctx.drawImage(carImages[i], xCars[i], yCars[i]);
+
+	}
+}
+
+const moveCars = () => {
+	for(let i = 0; i < carsSpeed.length; i++){
+		xCars[i] += carsSpeed[i];
+	}
+}
+
+const returnCars = () => {
+	let i = 0;
+	while(i < xCars.length){
+
+		if(offScreen(xCars[i])){
+			xCars[i] = -132;
+			//console.log(offScreen(xCars[i]));
+		}
+		i++;
+	}
+
+}
+
+function checkCarCollision (){
+
+		
+		for(let i = 0; i < xCars.length; i++){
+
+			if(yCars[i] < yCowPosition + 40 
+				&& yCars[i] + 69 > yCowPosition 
+				&& xCars[i] + 122 > xCowPosition 
+				&& xCars[i] < xCowPosition + 50) {
+
+				return true;
+				
+			} 	
+		}
+}
+
+function checkLifes (){
+
+	if(checkCarCollision()){
+
+		if (lifes > 1){
+
+			collisionSound();
+			alert("Puft! Pudim amassado...")
+			xCowPosition = 300;
+			yCowPosition = 460;
+			lifes--;
+			
+
+		} else if (lifes == 1){
+
+			collisionSound();
+			alert("Esta é minha última vida, por favor olhe para os dois lados antes de atravessar...")
+			xCowPosition = 300;
+			yCowPosition = 460;
+			lifes--;
+			
+
+		} else if (lifes <= 0){
+
+			collisionSound();
+			lifes = 0;
+			alert("GAME OVER! TRY AGAIN... if you dare.");
+			lifes = 3;
+			xCowPosition = 300;
+			yCowPosition = 460;
+			
+
+		}
+	}
+
+}
+
+function drawLifeCounter(){
+	ctx.fillStyle = "orange";
+	ctx.fillRect(50, 450, 40, 30);
+	ctx.strokeStyle = "white";
+	ctx.strokeRect(50, 450, 40, 30);
+	ctx.drawImage(imgCow, 20, 460, 20, 20);
+	ctx.fillStyle = "black";
+	ctx.font = "25px Arial"; 
+	ctx.fillText(lifes, 63, 472)
+
+}
+
+const checkWin = () => {
+	if (yCowPosition <= -10){
+
+		score();
+		track.pause();
+		alert(name + ", meus parabéns, a vaca, enfim, atravessou a rua. E, tendo alcançado seu destino, ela então se questiona: 'Onde terá ficado aquele bezerro que apenas conheço de fotografias e cuja memória há muito se perdeu na sedimentação dos dias? Não me recordo quando nos separamos. Quando um deixou de ser o outro. Onde está em mim aquela criança? A vaca que sou hoje é o resultado de todos os dias daquele bezerro? E se os dias tivessem sido outros, seria eu outra vaca? Se pudesse apagar alguns dias, seriam todos os outros suficientes para ser quem hoje sou? Apagar alguns dias. Apagar um dia, que fosse aquele dia. Será o bovino apenas o conjunto das suas memórias ou será, antes, a soma de todos os seus esquecimentos?'");
+		end = true;
+	}
+}
+
+
+
+
+function offScreen(xCar) {
+
+	 return xCar >= 600;
+	//return true or false for the boolean expression
+}
+
+function drawCow (){
+	ctx.drawImage(imgCow, xCowPosition, yCowPosition, 50, 40);
+}
+
+document.onkeydown = function(event){
+	if(event.keyCode == arrowUp){
+		yCowPosition -= 10;
+	}
+
+	if(event.keyCode == arrowDown){
+		yCowPosition += 10;
+	}
+
+	if(event.keyCode == arrowLeft){
+		xCowPosition -= 10;
+	}
+
+	if (event.keyCode == arrowRight){
+		xCowPosition += 10;
+	}
+
+}
+
+function checkBorderCollision() {
+
+	if (yCowPosition + 40 > 500){
+		yCowPosition = 460;
+	}
+	if (xCowPosition + 50 > 600){
+		xCowPosition = 550;
+	}
+
+	if (xCowPosition < 0){
+		xCowPosition = 0;
+	}
+}
+
+function askName(){
+	let nameTrue = false;
+
+	while(!nameTrue){
+		let name = prompt("'Qual o seu nome?' - perguntou a vaca.");
+		if(name.length > 0){
+			alert(name + ", por favor, me ajude a chegar ao ~outro lado~.")
+			track.play();
+			track.loop = true;
+			nameTrue = true;
+			return name;
+		} 
+	}
+
+
+}
+
+//Note: You cannot call the drawImage() method before the image has loaded. To ensure that the image has been loaded, you can call drawImage() from window.onload() or from document.getElementById("imageID").onload.
+
+
+//car1 variables
+//let xPosition = 0;
+//let speed = 3;
+//let yCar = 250;
+
+//car2 variables
+
+//let xPosition2 = 0; 
+//let speed2 = 1.5;
+//let yCar2 = 110;
+
+//car3 variables
+
+//let xPosition3 = 0;
+//let speed3 = 2;
+//let yCar3 = 318;
+
+//cow variables
+
+let xCowPosition = 300;
+let yCowPosition = 460;
+let arrowUp = 38;
+let arrowDown = 40;
+let arrowLeft = 37;
+let arrowRight = 39;
+
+
+//cars yPosition
+let yCars = [250, 110, 318, 178];
+
+//cars speed
+let carsSpeed = [1, 1.5, 1.2, 2];
+
+//cars xPosition
+let xCars = [0, 0, 0, 0];
+
+//life variable
+let lifes = 3;
+
+//end
+let end = false;
+
+//canvas variables
+let canvas = document.querySelector("canvas");
+let ctx = canvas.getContext("2d");
+let imgBg = new Image();
+let imgCar1 = new Image(); 
+let imgCar2 = new Image(); 
+let imgCar3 = new Image();
+let imgCow = new Image(); 
+imgBg.src = "material/estrada.png";
+imgCar1.src = "material/carro-1.png";
+imgCar2.src = "material/carro-2.png";
+imgCar3.src = "material/carro-3.png";
+imgCow.src = "material/ator-1.png"
+
+//cars images variables
+let carImages = [imgCar1, imgCar2, imgCar3, imgCar3];
+
+//audio variables and functions
+let collisionSound = () => {
+
+	return document.querySelector("#collision").play();
+}
+
+let scoreSound = () => {
+
+	document.querySelector("#score").play();
+}
+
+let score = scoreSound; //atribui a função à variável
+
+let track = document.querySelector("#soundtrack");
+
+let button = document.querySelector("button")
+
+button.onclick = () => Audio.prototype.play.call(track) //track.play(); Audio.prototype.play.bind(track)() ;
+
+
+
+//name
+let name = askName();
+//nesse caso a variável track precisa ter sido inicializada para que sua função play() seja executada na função askName, cujo retorno será atribuído à variável name.
+//Do contrário o console acusará cannot acces track before inicialization.
+
+setInterval(refreshScreen, 1);
+
+</script>
+</html>
