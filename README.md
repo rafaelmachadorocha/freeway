@@ -1,3 +1,3 @@
 # freeway game
 
-Finished but up to improvement. Needs refactoring.
+Freeway game made using JavaScript and HTML. Finished but up to improvement. Needs refactoring.
